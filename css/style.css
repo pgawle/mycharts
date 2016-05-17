@@ -1,0 +1,27 @@
+.baseSVG {
+    background: red;
+}
+
+
+
+
+.zone{
+    stroke-width: 150;
+    stroke-linejoin: round;
+    fill: #90C3D4;
+    stroke: #90C3D4;
+}
+
+
+
+
+.node_background{
+    fill: #CAD658;
+    stroke: #CAD658;
+}
+
+.link{
+    stroke: #4043d6;
+    stroke-width: 5px;
+    fill: none;
+}

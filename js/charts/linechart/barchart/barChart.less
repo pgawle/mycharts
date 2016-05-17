@@ -1,0 +1,150 @@
+.barChart{
+
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    .chartWrapper{
+      position: relative;
+    }
+
+    .yAxis_labels{
+      path,
+      line{
+        fill: none;
+        stroke: none;
+      }
+
+      text{
+        stroke: #f8536f;
+        fill: #f8536f;
+        opacity: 0.2;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 14px;
+      }
+    }
+
+    .yAxis_lines{
+      path,
+      line{
+        fill: none;
+        stroke: none;
+      }
+
+      .tick line{
+        stroke: #f8536f;
+        stroke-dasharray: 10;
+        stroke-width: 1px;
+        opacity: 0.2;
+      }
+
+      text{
+        display: none;
+      }
+    }
+
+    .xAxis{
+      path,
+      line{
+        fill: none;
+        stroke: none;
+      }
+
+
+
+      text{
+        .day{
+          fill: #300a10;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 14px;
+        }
+
+        .date{
+          fill: #baafb1;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 13px;
+
+        }
+
+      }
+    }
+
+
+    //background: green;
+
+
+    svg{
+      position: absolute;
+      top: 0px;
+      left: 0px;
+    }
+
+    .chartSlider{
+      padding: 0;
+      width: 99%;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 10;
+
+      input{
+        padding: 0;
+        width: 100%;
+      }
+    }
+
+    svg.chart_y{
+      //background: blueviolet;
+      //opacity: 0.2;
+      z-index: 1;
+    }
+
+    svg.d3chart {
+      //background: blue;
+      //opacity: 0.1;
+      z-index: 2;
+
+      .line {
+        //stroke: #f8536f;
+        stroke-width: 4px;
+        fill: none;
+
+        //&.line1{
+        //  stroke: #f7b540;
+        //}
+
+      }
+
+
+      .area {
+        //fill: #f8536f;
+        fill-opacity: 0.5;
+
+        //&.area1{
+        //  fill: #f7b540;
+        //}
+
+
+      }
+
+      .point {
+        r: 5;
+        stroke-width: 3px;
+        //stroke: #f8536f;
+        fill: #fff;
+
+        &.point1{
+          //stroke: #f7b540;
+        }
+
+      }
+
+    }
+
+
+
+
+
+}
