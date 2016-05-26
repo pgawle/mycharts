@@ -60,9 +60,16 @@ data: {},
         this.data.paths = this.setUpPaths(this.data);
         this.data.chart_nodes = this.setUpChartNodes(this.data);
 
-
+        this.data = this.setUpDrag(this.data);
 
         this.setupTick(this.data);
+
+        this.setUpZoom(this.data);
+
+
+
+
+
         //this.data = this.setupZones(this.data);
 
 
@@ -131,7 +138,7 @@ data: {},
         }).entries(data.nodes);
 
 
-        console.log(data);
+        //console.log(data);
 
         //data.zones = arguments.zones;
         //data.nodes = structured_data.nodes;
@@ -216,7 +223,10 @@ data: {},
             //    data.zone_manager.concetrateNodesInZones(d, data.nodes);
             //    data.zone_manager.tick(data.svgObj, data.chart_zones, data.zones_link_chart.force_chart);
             //}
+
             BGCharts.paths.tick(data.paths);
+            //console.log(11,BGCharts.paths);
+            //BGCharts.paths.tick2(data.paths);
             BGCharts.nodes.tick(data.chart_nodes)
             //if (data.zones_link_chart) {
             //    data.zones_link_chart.force_chart.start();
@@ -224,8 +234,44 @@ data: {},
 
         });
 
-    }
+    },
 
+    setUpZoom: function (data) {
+        var zoom_arguments = {
+            container_id: data.container_id,
+            svgObj: data.svgObj,
+            chart_wrapper: data.chart_wrapper,
+            zoom_level: data.zoom_level
+
+        }
+
+        new BGCharts.zoom(zoom_arguments);
+    },
+
+    setUpDrag: function (data) {
+
+        var center_points = [];
+
+        if (data.zone_manager) {
+            center_points = data.zone_manager.getCenterPoints();
+        }
+
+        var attribs = {
+            svgObj: data.svgObj,
+            gnodes: data.chart_nodes,
+            zones: data.chart_zones,
+            force: data.force,
+            center_points: center_points
+        }
+
+        var drag = new BGCharts.drag();
+
+        drag.add(attribs);
+
+        data.drag = drag;
+
+        return data;
+    },
 
 
 

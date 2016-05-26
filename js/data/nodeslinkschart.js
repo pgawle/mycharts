@@ -44,27 +44,35 @@ BGCharts.nodeslinksdata = {
             'same_connection_index': 0
         },
         {
-            source: 1,
-            target: 0,
-            'type': 'hate',
+            source: 0,
+            target: 1,
+            'type': 'love',
             'same_connection_index': 1
         },
         {
-            source: 0,
-            target: 1,
-            'type': 'friendzone',
-            'same_connection_index': 2
-        },
-        {
             source: 1,
             target: 0,
-            'type': 'love'
+            'type': 'hate',
+            'same_connection_index': 2,
+            'bidirectional': true
         },
-        {
-            source: 2,
-            target: 3,
-            'type': 'hate'
-        }
+        //{
+        //    source: 0,
+        //    target: 1,
+        //    'type': 'friendzone',
+        //    'same_connection_index': 3
+        //},
+        //{
+        //    source: 1,
+        //    target: 0,
+        //    'type': 'love'
+        //},
+        //{
+        //    source: 2,
+        //    target: 3,
+        //    'type': 'hate',
+        //    'bidirectional': true
+        //}
 
     ],
 

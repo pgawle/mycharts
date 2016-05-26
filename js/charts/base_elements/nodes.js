@@ -23,7 +23,8 @@ BGCharts.nodes = {
 
 
         var gnodes_inner = container.selectAll('g.node').append('g')
-            .attr('class', 'node_inner');
+            .attr('class', 'node_inner')
+            .attr("transform", function(d){return "translate(-"+ (d.width/2)+",-"+(d.height/2)+")"});
 
         //console.log(data.nodes_settings);
 
@@ -32,7 +33,6 @@ BGCharts.nodes = {
             .attr("height",function(d){return d.height;})
             .attr("rx", 15)
             .attr("ry", 15)
-            .attr("transform", "translate(0,-5)")
             .attr('class', 'node_background');
 
         //var rect = gnodes_inner.append("rect")
@@ -100,17 +100,17 @@ BGCharts.nodes = {
 
 
 
-        var images = images_wrapper
-            .append("image")
-            .attr("xlink:href", function (data) {
-                return data.image_url;
-            })
-            .attr("width", function (d) {
-                return d.width;
-            })
-            .attr("height", function (d) {
-                return d.height;
-            });
+        //var images = images_wrapper
+        //    .append("image")
+        //    .attr("xlink:href", function (data) {
+        //        return data.image_url;
+        //    })
+        //    .attr("width", function (d) {
+        //        return d.width;
+        //    })
+        //    .attr("height", function (d) {
+        //        return d.height;
+        //    });
 
 
 
@@ -195,7 +195,7 @@ BGCharts.nodes = {
 
             return "translate(" + (d.x) + "," + (d.y) + ")";
         });
-    },
+    }
 
     //tickConversation: function (node, width) {
     //

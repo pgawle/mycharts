@@ -5,7 +5,9 @@ if (!window.BGCharts) {
 BGCharts.paths = {
     create: function (container, force, svgObj) {
 
-        var paths = container.append("svg:g")
+        var links = force.links();
+
+        var links_wrapper = container.append("svg:g")
             .attr('class', 'links')
             .selectAll('path')
             .data(force.links())
@@ -13,47 +15,34 @@ BGCharts.paths = {
             .append('svg:g')
             .attr('class', function (d) {
                 return 'link_wrapper';
-            })
-            .append('path')
+            });
+
+
+        links_wrapper.append('path')
             .attr("class", function (d) {
-                var className = "link " + d.type;
-                //if (d.has_active_alarm === true) {
-                //
-                //    className += " alarm_on";
-                //}
-                //
-                //if(d.policy_path === true){
-                //    className += " policy_path";
-                //}
-                //
-                //
-                //if (d.type === 'position_only') {
-                //    return 'hidden';
-                //}
-                //
-                //if (d.type === 'zone_link') {
-                //    return 'zone_link';
-                //}
+                var className = "link " + d.type + " half1";
                 return className;
             })
-            //.attr('id', function (d) {
-            //    console.log(d);
-            //
-            //    //if(d.type === 'zone_link'){
-            //    //    return "zone_link" + d.index;
-            //    //}
-            //
-            //    return "link" + d.index;
-            //})
-            .attr("marker-mid", function (d) {
+            .attr('half1', true)
+
+        links_wrapper.append('path')
+            .attr("class", function (d) {
+                var className = "link " + d.type + " half2";
+                return className;
+            })
+            .attr("marker-start", function (d) {
                 if (d.bidirectional) {
                     return "url(#double-arrow)";
                 }
                 return "url(#arrow)";
             })
+            .attr('half1', false);
 
 
-        //this.addArrow(svgObj);
+        var paths = links_wrapper;
+
+
+        this.addArrow(svgObj);
 
         return paths;
     },
@@ -77,45 +66,57 @@ BGCharts.paths = {
     //
     //},
 
-    //addArrow: function (svgObj) {
-    //
-    //
-    //    var doubleArrow = svgObj.append("svg:defs").selectAll("marker")
-    //        .data(["double-arrow"])
-    //        .enter().append("svg:marker")
-    //        .attr("id", String)
-    //        .attr("refY", 0)
-    //        .attr("refX", 0)
-    //        .attr("viewBox", "0 -20 40 40")
-    //        .attr("markerWidth", 20)
-    //        .attr("markerHeight", 20)
-    //        .attr("markerUnits", 'userSpaceOnUse')
-    //        .attr("orient", "auto");
-    //
-    //    doubleArrow.append("svg:path")
-    //        .attr("d", "M0,-5L10,0L0,5")
-    //        .attr('transform', 'translate(20)');
-    //
-    //    doubleArrow.append("svg:path")
-    //        .attr("d", "M0,0L10,-5L10,5")
-    //        .attr('transform', 'translate(0)');
-    //
-    //    svgObj.append("svg:defs").selectAll("marker")
-    //        .data(["arrow"])
-    //        .enter().append("svg:marker")
-    //        .attr("id", String)
-    //        .attr("viewBox", "0 -5 10 10")
-    //        .attr("refX", 0)
-    //        .attr("markerWidth", 6)
-    //        .attr("markerHeight", 6)
-    //        .attr("orient", "auto")
-    //        .attr("markerUnits", 'userSpaceOnUse')
-    //        .append("svg:path")
-    //        .attr("d", "M0,-5L10,0L0,5");
-    //},
+    addArrow: function (svgObj) {
+
+        var doubleArrow = svgObj.append("svg:defs").selectAll("marker")
+            .data(["double-arrow"])
+            .enter().append("svg:marker")
+            .attr("id", String)
+            .attr("refY", 0)
+            .attr("refX", 15)
+            .attr("viewBox", "0 -20 40 40")
+            .attr("markerWidth", 40)
+            .attr("markerHeight", 40)
+            .attr("markerUnits", 'userSpaceOnUse')
+            .attr('class', "double-arrow")
+            .attr("orient", "auto")
+
+        doubleArrow.append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr('transform', 'translate(20)');
+
+        doubleArrow.append("svg:path")
+            .attr("d", "M0,0L10,-5L10,5")
+            .attr('transform', 'translate(0)');
+
+        var arrow = svgObj.append("svg:defs").selectAll("marker")
+            .data(["arrow"])
+            .enter().append("svg:marker")
+            .attr("id", String)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 5)
+            .attr("refY", 0)
+            .attr("markerWidth", 10)
+            .attr("markerHeight", 10)
+            .attr("orient", "auto")
+            .attr("markerUnits", 'userSpaceOnUse')
+            .attr("class", "arrow")
+            .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5")
+
+
+    },
 
     tick: function (path) {
-        path.attr("d", function (d) {
+
+        var that = this;
+
+        /** This is fix for IE, to render correctly and show them. **/
+        path.each(function () {
+            this.parentNode.insertBefore(this, this);
+        });
+
+        path.each(function (d, index) {
 
             //in order to arrow be placed in the middle we need create two lines that are connected in the middle
             //https://www.dashingd3js.com/svg-paths-and-d3js
@@ -138,52 +139,136 @@ BGCharts.paths = {
 
             var c = Math.sqrt(Math.pow((target.x - source.x), 2) + Math.pow((target.y - source.y), 2)) / 2;
             var r = (h / 2) + Math.pow(c, 2) / (2 * h);
-            var middle = this.getMiddleLinePoint({target: target, source: source, height: h});
+            var middle = that.getMiddleLinePoint({target: target, source: source, height: h});
 
+
+            var path1 = d3.select(this).select('path.half1');
+            var path2 = d3.select(this).select('path.half2');
+            //var path2 = this.select('path.half2');
+            //console.log(11,path1);
+            //console.log(22,path1);
 
             if (h === 0) {
-                var pathDef = [
+
+                var pathDef1 = [
                     'M', source.x, source.y,
                     'L', middle.x, middle.y,
+                ].join(" ");
+
+
+                var pathDef2 = [
+                    'M', middle.x, middle.y,
                     'L', target.x, target.y
                 ].join(" ");
 
             } else {
-                var pathDef = [
+                var pathDef1 = [
                     'M', source.x, source.y,
                     'A', r, r, 0, 0, 1, middle.x, middle.y,
+                ].join(" ");
+
+
+                var pathDef2 = [
+                    'M', middle.x, middle.y,
                     'A', r, r, 0, 0, 1, target.x, target.y
                 ].join(" ");
             }
 
-            return pathDef;
-        }.bind(this));
+            path1.attr('d',pathDef1);
+            path2.attr('d',pathDef2);
+
+        });
+
+
+        //console.log(111,path.attr('half1'));
+        //console.log(333, path.selectAll('path'));
+
+
+        //var path1 = path.selectAll('path.half1');
+        //var path2 = path.selectAll('path.half2');
+
+
+        //path1.attr("d", function (d) {
+        //    console.log(d);
+        //
+        //    //in order to arrow be placed in the middle we need create two lines that are connected in the middle
+        //    //https://www.dashingd3js.com/svg-paths-and-d3js
+        //    //http://www.purplemath.com/modules/midpoint.htm
+        //
+        //    var h = 0;
+        //    if (d.same_connection_index) {
+        //        h = d.same_connection_index * 20;
+        //    }
+        //
+        //
+        //    var target = {}, source = {};
+        //
+        //    target['x'] = d.target.x;
+        //    target['y'] = d.target.y;
+        //
+        //    source['x'] = d.source.x;
+        //    source['y'] = d.source.y;
+        //
+        //
+        //    var c = Math.sqrt(Math.pow((target.x - source.x), 2) + Math.pow((target.y - source.y), 2)) / 2;
+        //    var r = (h / 2) + Math.pow(c, 2) / (2 * h);
+        //    var middle = this.getMiddleLinePoint({target: target, source: source, height: h});
+        //
+        //
+        //    if (h === 0) {
+        //        var pathDef = [
+        //            'M', source.x, source.y,
+        //            'L', middle.x, middle.y,
+        //            'L', target.x, target.y
+        //        ].join(" ");
+        //
+        //    } else {
+        //
+        //
+        //        if(path.attr('half1') === "true"){
+        //            var pathDef = [
+        //                'M', source.x, source.y,
+        //                'A', r, r, 0, 0, 1, middle.x, middle.y,
+        //            ].join(" ");
+        //        }else{
+        //            var pathDef = [
+        //                'M', middle.x, middle.y,
+        //                'A', r, r, 0, 0, 1, target.x, target.y
+        //            ].join(" ");
+        //        }
+        //
+        //
+        //    }
+        //
+        //    //console.log(pathDef);
+        //    return pathDef;
+        //}.bind(this));
 
     },
 
     tickForConversationChart: function (path) {
         path.attr("d", function (d) {
 
-            var target ={}, source= {};
+            var target = {}, source = {};
 
             //target['x'] = d.target.x - transition+ target_left;
 
             source['x'] = d.source.x;
             source['y'] = d.source.y;
             var transition = 100;
-            if(source['x'] < d.target.x){
+            if (source['x'] < d.target.x) {
                 transition = -100;
             }
             target['x'] = d.target.x + transition;
             target['y'] = d.target.y;
 
-            var curve_x = target.x+transition;
+            var curve_x = target.x + transition;
             var curve_y = target.y;
 
             //x1 y1 x2 y2 x y
             var pathDef = [
                 'M', source.x, source.y,
-                'S', curve_x,curve_y,target.x, target.y
+                'S', curve_x, curve_y, target.x, target.y
             ].join(" ");
 
 
@@ -290,13 +375,13 @@ BGCharts.paths = {
 
     appendConversationNodesInfoBox: function (data) {
         var $info_box = $('#chartTemplates .ZoneConversationInfoBox').clone();
-        $('#'+data.container_id).append($info_box)
+        $('#' + data.container_id).append($info_box)
 
 
         var that = this;
 
         data.zones_link_chart.paths.on('mouseover', function (element) {
-            that.zoneCoversationMouseOver(element,data.container_id);
+            that.zoneCoversationMouseOver(element, data.container_id);
         });
 
         data.zones_link_chart.paths.on('mouseout', function (element) {
@@ -305,14 +390,14 @@ BGCharts.paths = {
 
     },
 
-    zoneCoversationMouseOver: function(element,container_id){
+    zoneCoversationMouseOver: function (element, container_id) {
 
-        var $info_box = $('#'+container_id+ ' .ZoneConversationInfoBox');
+        var $info_box = $('#' + container_id + ' .ZoneConversationInfoBox');
         $info_box.find('.info_row').remove();
-        var $header =$info_box.find('.header');
+        var $header = $info_box.find('.header');
         var $table = $info_box.find('table');
 
-        element.links.forEach(function(link){
+        element.links.forEach(function (link) {
             var $row = $header.clone();
             $row.removeClass('header').addClass('info_row');
             $row.find('.targetPort').text(link.target_port);
@@ -327,8 +412,8 @@ BGCharts.paths = {
         $info_box.removeClass('hidden');
     },
 
-    zoneCoversationMouseOut: function(container_id){
-        var $info_box = $('#'+container_id+ ' .ZoneConversationInfoBox');
+    zoneCoversationMouseOut: function (container_id) {
+        var $info_box = $('#' + container_id + ' .ZoneConversationInfoBox');
         $info_box.addClass('hidden');
     },
 
