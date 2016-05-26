@@ -21,9 +21,8 @@ BGCharts.zoom.prototype = {
         var container_wrapper = d3.select('#'+container_id);
         var chart_wrapper = arguments.chart_wrapper;
         this.zoom_level = arguments.zoom_level;
-        $('#' + container_id + ' p.slider_wrapper').remove();
+        d3.selectAll('#' + container_id + ' p.slider_wrapper').remove();
         var slider = d3.select('#'+container_id).append("p").attr('class','slider_wrapper').append("input").attr('id', container_id + "chart_slider");
-
 
         var zoom = d3.behavior.zoom()
             .scaleExtent([0.1, 10])
