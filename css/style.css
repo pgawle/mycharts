@@ -6,9 +6,6 @@
     stroke: #90C3D4;
 }
 
-
-
-
 .node_background{
     fill: #CAD658;
     stroke: #CAD658;
@@ -37,5 +34,22 @@
     markerHeight: 20;
 }
 
-/*.attr("markerWidth", 4)*/
-/*.attr("markerHeight", 4)*/
+
+.zone {
+    stroke-width: 150;
+    stroke-linejoin: round;
+    fill: #373737;
+    stroke: #373737;
+}
+
+.zonelabel{
+    fill: red;
+    stroke: red;
+}
+
+
+.zone_link{
+    stroke: #d6ce51;
+    stroke-width: 10px;
+    fill: none;
+}

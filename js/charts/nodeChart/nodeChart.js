@@ -16,4 +16,6 @@ BGCharts.nodeChart = function (arguments,container_id) {
 
 BGCharts.nodeChart.prototype = Object.create(BGCharts.baseForcechart.prototype);
 
+/** Disable method **/
+
 BGCharts.nodeChart.prototype.setupZones = function(data){return data}

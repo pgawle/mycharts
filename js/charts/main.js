@@ -4,8 +4,21 @@ if (!window.BGCharts) {
 
 BGCharts.App = {
 
-    createChart: function (chart_data, container_id) {
+
+    data:  {
+        nodes: BGCharts.nodeslinksdata.nodes,
+        links: BGCharts.nodeslinksdata.links
+    },
+
+
+
+    createNodeChart: function (chart_data, container_id) {
         var chart = new BGCharts.nodeChart(chart_data, container_id);
+        return chart;
+    },
+
+    createZoneChart: function (chart_data, container_id) {
+        var chart = new BGCharts.zoneChart(chart_data, container_id);
         return chart;
     }
 

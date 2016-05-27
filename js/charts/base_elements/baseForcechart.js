@@ -15,7 +15,6 @@ BGCharts.baseForcechart = function (arguments) {
 BGCharts.baseForcechart.prototype = {
 
 
-
 data: {},
 
     settings: {
@@ -47,15 +46,14 @@ data: {},
         }
 
 
-
+        this.data = this.createChartWrappers(this.data);
         this.data.force = this.createForceChart(this.data);
         /**
          * We start force chart here to have indexes
          */
-
         this.data.force.start();
 
-        this.data = this.createChartWrappers(this.data);
+        this.data = this.setupZones(this.data);
 
         this.data.paths = this.setUpPaths(this.data);
         this.data.chart_nodes = this.setUpChartNodes(this.data);
@@ -63,6 +61,10 @@ data: {},
         this.data = this.setUpDrag(this.data);
 
         this.setupTick(this.data);
+
+
+        /**This is for stop rest of element from moving (zone links for example)*/
+        this.setupOnEndChart(this.data);
 
         this.setUpZoom(this.data);
 
@@ -134,8 +136,15 @@ data: {},
 
 
         data.zones = d3.nest().key(function (d) {
-            return d.zone;
+                return d.zone;
         }).entries(data.nodes);
+
+
+
+        //console.log(22,data.zones.key('empty'));
+
+
+
 
 
         //console.log(data);
@@ -219,18 +228,19 @@ data: {},
     setupTick: function (data) {
 
         data.force.on('tick', function (d) {
-            //if (data.zone_manager) {
-            //    data.zone_manager.concetrateNodesInZones(d, data.nodes);
-            //    data.zone_manager.tick(data.svgObj, data.chart_zones, data.zones_link_chart.force_chart);
-            //}
+            if (data.zone_manager) {
+                data.zone_manager.concetrateNodesInZones(d, data.nodes);
+                data.zone_manager.tick(data.svgObj, data.chart_zones, data.zones_link_chart.force_chart);
+            }
 
             BGCharts.paths.tick(data.paths);
             //console.log(11,BGCharts.paths);
             //BGCharts.paths.tick2(data.paths);
-            BGCharts.nodes.tick(data.chart_nodes)
-            //if (data.zones_link_chart) {
-            //    data.zones_link_chart.force_chart.start();
-            //}
+            BGCharts.nodes.tick(data.chart_nodes);
+
+            if (data.zones_link_chart) {
+                data.zones_link_chart.force_chart.start();
+            }
 
         });
 
@@ -271,6 +281,128 @@ data: {},
         data.drag = drag;
 
         return data;
+    },
+
+    setupZones: function (data) {
+
+        data.zone_manager = new BGCharts.zones(this.width, this.height, data.zones);
+        data = this.setUpZoneLinks(data);
+        data.chart_zones = data.zone_manager.add(data.chart_wrapper, data.zones);
+
+        return data;
+    },
+
+    setUpZoneLinks: function (data) {
+        if (data.zone_manager !== undefined) {
+
+            var tmp_links = {};
+            var tmp_nodes = {};
+            var zone_nodes = [];
+
+            data.nodes.forEach(function (o) {
+                tmp_nodes[o.zone] = {
+                    zone_name: o.zone,
+                    zone: o.zone
+                }
+
+            });
+
+            var index = 0;
+
+            for (var key in tmp_nodes) {
+                if (tmp_nodes.hasOwnProperty(key)) {
+                    tmp_nodes[key]['index'] = index;
+                    zone_nodes.push(tmp_nodes[key]);
+                    index++;
+                }
+            }
+
+
+            data.links.forEach(function (o) {
+                if (o.source.zone !== undefined
+                    && o.target.zone!== undefined
+                    && o.target.zone !== o.source.zone
+                ) {
+                    var key = o.source.zone + "A" + o.target.zone;
+
+                    if (o.target.zone < o.source.zone) {
+                        key = o.target.zone + "A" + o.source.zone;
+                    }
+
+                    if (tmp_links[key]) {
+                        if (o.has_active_alarm === true) {
+                            tmp_links[key].has_active_alarm = true;
+                        }
+
+                    } else {
+                        tmp_links[key] = {
+                            target: tmp_nodes[o.target.zone].index,
+                            source: tmp_nodes[o.source.zone].index,
+                            type: 'zone_link',
+                            hidden: true,
+                            has_active_alarm: o.has_active_alarm
+                        }
+                    }
+
+                    if (tmp_links[key].links === undefined) {
+                        tmp_links[key].links = [];
+                    }
+
+                    tmp_links[key].links.push(o);
+
+
+                }
+            });
+
+            var zone_links = [];
+            var z_index = 0;
+
+            for (var key in tmp_links) {
+                if (tmp_links.hasOwnProperty(key)) {
+                    tmp_links[key]['index'] = z_index;
+                    zone_links.push(tmp_links[key]);
+                    z_index++;
+                }
+            }
+
+            data['zones_link_chart'] = {};
+
+            data['zones_link_chart']['links'] = zone_links;
+
+            var force = d3.layout.force()
+                .nodes(zone_nodes)
+                .links(zone_links)
+                .size([this.width, this.height])
+                .linkDistance(data.linkDistance)
+                .charge(data.charge)
+                .gravity(data.gravity)
+                .linkStrength(0);
+
+            var paths = BGCharts.paths.create(data.chart_wrapper, force, data.svgObj);
+            force.on('tick', function (d) {
+                BGCharts.paths.tick(paths);
+            });
+
+
+            data['zones_link_chart'] = {
+                force_chart: force,
+                paths: paths
+            }
+
+
+        }
+
+        return data;
+    },
+
+    setupOnEndChart: function (data) {
+
+        /** to stop zone links from moving **/
+        data.force.on('end', function (d) {
+            if (data.zones_link_chart) {
+                data.zones_link_chart.force_chart.stop();
+            }
+        });
     },
 
 

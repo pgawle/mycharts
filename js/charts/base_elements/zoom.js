@@ -28,9 +28,6 @@ BGCharts.zoom.prototype = {
             .scaleExtent([0.1, 10])
             .on("zoom", this.zoomed.bind(this, chart_wrapper, slider,container_wrapper),false);
 
-
-        console.log(d3.select('#'+container_id+" .base"));
-        console.log('#'+container_id+" .base");
         d3.select('#'+container_id+" .baseSVG").call(zoom);
 
         slider.datum({})
