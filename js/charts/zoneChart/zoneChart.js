@@ -14,7 +14,7 @@ BGCharts.zoneChart = function (arguments, container_id) {
 
     BGCharts.baseForcechart.call(this, arguments);
 
-    //this.showZonesConversationsOnly(true);
+    //this.showZonesLinksOnly(true);
 
 
 }

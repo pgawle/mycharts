@@ -560,7 +560,7 @@ VAP.baseForcechart.prototype = {
     },
 
     clearChart: function (data) {
-        VAP.onchartactions.clearChartElements(data);
+        VAP.onchartactions.clearChartElementsModes(data);
     },
 
     update: function (chart_data) {

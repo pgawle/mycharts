@@ -1,5 +1,5 @@
 if (!window.BGCharts) {
-    window.BGCharts= {};
+    window.BGCharts = {};
 }
 
 
@@ -15,7 +15,7 @@ BGCharts.baseForcechart = function (arguments) {
 BGCharts.baseForcechart.prototype = {
 
 
-data: {},
+    data: {},
 
     settings: {
         charge: -200,
@@ -55,8 +55,16 @@ data: {},
 
         this.data = this.setupZones(this.data);
 
-        this.data.paths = this.setUpPaths(this.data);
         this.data.chart_nodes = this.setUpChartNodes(this.data);
+
+
+        //this.addOnClikNodes(this.data);
+        //this.addOnClikPaths(this.data);
+        //this.addOnClickZones(this.data);
+
+        this.addMouseEventsForNodes(this.data);
+        this.addMouseEventsZones(this.data);
+
 
         this.data = this.setUpDrag(this.data);
 
@@ -69,17 +77,13 @@ data: {},
         this.setUpZoom(this.data);
 
 
-
+        this.data.paths = this.setUpPaths(this.data);
 
 
         //this.data = this.setupZones(this.data);
 
 
         //this.data.paths = this.setUpPaths(this.data);
-
-
-
-
 
 
     },
@@ -126,25 +130,31 @@ data: {},
         data.nodes = arguments.nodes;
         data.links = arguments.links;
 
-        data.nodes.forEach(function(d){
+        data.nodes.forEach(function (d) {
             d.width = this.settings.node_settings.width;
             d.height = this.settings.node_settings.height;
+            d.type = "node";
+        }.bind(this));
 
 
-        }.bind(this))
+        /** Add index for id creation **/
 
-
+        data.links.forEach(function (d, index) {
+            d.type = "link"
+            d.index = index;
+        })
 
         data.zones = d3.nest().key(function (d) {
-                return d.zone;
+            return d.zone;
         }).entries(data.nodes);
 
 
+        data.zones.forEach(function (d, index) {
+            d.type = "zone"
+            d.index = index;
+        })
 
         //console.log(22,data.zones.key('empty'));
-
-
-
 
 
         //console.log(data);
@@ -320,7 +330,7 @@ data: {},
 
             data.links.forEach(function (o) {
                 if (o.source.zone !== undefined
-                    && o.target.zone!== undefined
+                    && o.target.zone !== undefined
                     && o.target.zone !== o.source.zone
                 ) {
                     var key = o.source.zone + "A" + o.target.zone;
@@ -329,19 +339,11 @@ data: {},
                         key = o.target.zone + "A" + o.source.zone;
                     }
 
-                    if (tmp_links[key]) {
-                        if (o.has_active_alarm === true) {
-                            tmp_links[key].has_active_alarm = true;
-                        }
-
-                    } else {
-                        tmp_links[key] = {
-                            target: tmp_nodes[o.target.zone].index,
-                            source: tmp_nodes[o.source.zone].index,
-                            type: 'zone_link',
-                            hidden: true,
-                            has_active_alarm: o.has_active_alarm
-                        }
+                    tmp_links[key] = {
+                        target: tmp_nodes[o.target.zone].index,
+                        source: tmp_nodes[o.source.zone].index,
+                        type: 'zone_link',
+                        hidden: false
                     }
 
                     if (tmp_links[key].links === undefined) {
@@ -405,6 +407,103 @@ data: {},
         });
     },
 
+    showZonesLinksOnly: function (show_zones_conversations_only) {
+        //var link_hidden = false;
+        //var zone_link_hidden = true;
+        ////this.view_type = this.VIEW_TYPES.DEFAULT;
+
+        this.clearChart(this.data);
+
+        this.data.zones_link_chart.force_chart.links().forEach(function (d) {
+            d.hidden = false;
+        });
+
+        this.data.links.forEach(function (d) {
+            d.hidden = true;
+        })
+
+        //console.log(this.data.links;
+
+        //console.log(222,this.data.zones_link_chart.force_chart.links());
+
+
+        //this.data.container_element.classed('zone_coversation_view', false);
+        //if (show_zones_conversations_only === true) {
+        //    link_hidden = true;
+        //    zone_link_hidden = false;
+        //this.view_type = this.VIEW_TYPES.ZONE_VIEW;
+        //this.data.container_element.classed('zone_coversation_view', true);
+        //}
+
+        //this.data.force.links().forEach(function (link) {
+        //    link.hidden = link_hidden;
+        //});
+        //
+        //if (this.data.zones_link_chart) {
+        //    this.data.zones_link_chart.force_chart.links().forEach(function (link) {
+        //        link.hidden = zone_link_hidden;
+        //    });
+        //}
+
+        this.updateView(this.data);
+    },
+
+    clearChart: function (data) {
+        BGCharts.onchartactions.clearChartElementsModes(data);
+    },
+
+    updateView: function (data) {
+        BGCharts.onchartactions.updateChartVisuals(data);
+    },
+
+    addMouseEventsForNodes: function (data) {
+        var that = this;
+        data.chart_nodes.on('click', function (element) {
+            if (element.selected === true) {
+                that.clearChart(data);
+                that.updateView(data);
+            } else {
+                that.clearChart(data);
+                element.selected = true;
+                that.updateView(data);
+            }
+        });
+    },
+
+    addMouseEventsZones: function (data) {
+
+
+
+        if (data.chart_zones) {
+
+            var that = this;
+            data.chart_zones.on('click', function (element) {
+
+                if (element.selected === true) {
+                    that.clearChart(data);
+                    that.updateView(data);
+                } else {
+                    that.clearChart(data);
+                    element.selected = true;
+                    that.updateView(data);
+                }
+                //var events_arguments = {
+                //    data: data,
+                //    event_element: element,
+                //    event_this: this
+                //}
+                //if (that.view_type === that.VIEW_TYPES.ZONE_VIEW) {
+                //    VAP.onchartactions.toggleZoneSelectionZoneConversationMode(events_arguments);
+                //} else {
+                //    //VAP.onchartactions.toggleZoneSelectionZoneConversationMode(events_arguments_2);
+                //    if (!data.top_wrapper.classed('edit_mode')) {
+                //        VAP.onchartactions.toggleZoneSelection(events_arguments);
+                //    }
+                //
+                //}
+            });
+        }
+    },
 
 
 };

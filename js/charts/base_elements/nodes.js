@@ -13,10 +13,10 @@ BGCharts.nodes = {
             })
             .attr("class", function (d) {
 
-                var class_name = "node " + d.type + " " +d.name;
-                if (d.element_not_selectable) {
-                    class_name = class_name + ' ' + 'element_not_selectable';
-                }
+                var class_name = d.type+" "+ d.category + " " +d.name;
+                //if (d.element_not_selectable) {
+                //    class_name = class_name + ' ' + 'element_not_selectable';
+                //}
 
                 return class_name;
             })
@@ -189,9 +189,9 @@ BGCharts.nodes = {
     tick: function (node) {
         node.attr("transform", function (d) {
 
-            if ("node" === d.type) {
-                return "translate(" + (d.x - (d.image_width / 2)) + "," + (d.y - (d.image_height / 2)) + ")";
-            }
+            //if ("node" === d.type) {
+            //    return "translate(" + (d.x - (d.image_width / 2)) + "," + (d.y - (d.image_height / 2)) + ")";
+            //}
 
             return "translate(" + (d.x) + "," + (d.y) + ")";
         });

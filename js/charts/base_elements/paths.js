@@ -5,7 +5,9 @@ if (!window.BGCharts) {
 BGCharts.paths = {
     create: function (container, force, svgObj) {
 
-        var links = force.links();
+        //var links = force.links();
+
+        //console.log(force.links());
 
         var links_wrapper = container.append("svg:g")
             .attr('class', 'links')
@@ -14,20 +16,23 @@ BGCharts.paths = {
             .enter()
             .append('svg:g')
             .attr('class', function (d) {
-                return 'link_wrapper';
+                return d.type;
+            })
+            .attr('id',function(d){
+                return d.type+ d.index;
             });
 
 
         links_wrapper.append('path')
             .attr("class", function (d) {
-                var className = "link " + d.type + " half1";
+                var className = d.type+"_inner half1";
                 return className;
-            })
-            .attr('half1', true)
+            });
+
 
         links_wrapper.append('path')
             .attr("class", function (d) {
-                var className = "link " + d.type + " half2";
+                var className = d.type+"_inner half2";
                 return className;
             })
             .attr("marker-start", function (d) {
@@ -35,8 +40,8 @@ BGCharts.paths = {
                     return "url(#double-arrow)";
                 }
                 return "url(#arrow)";
-            })
-            .attr('half1', false);
+            });
+
 
 
         var paths = links_wrapper;

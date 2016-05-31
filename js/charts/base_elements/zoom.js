@@ -26,9 +26,11 @@ BGCharts.zoom.prototype = {
 
         var zoom = d3.behavior.zoom()
             .scaleExtent([0.1, 10])
-            .on("zoom", this.zoomed.bind(this, chart_wrapper, slider,container_wrapper),false);
+            //.on("dblclick.zoom", null)
+            .on("zoom", this.zoomed.bind(this, chart_wrapper, slider,container_wrapper),false)
+            //.on("dblclick.zoom", null);
 
-        d3.select('#'+container_id+" .baseSVG").call(zoom);
+        d3.select('#'+container_id+" .baseSVG").call(zoom).on("dblclick.zoom", null);
 
         slider.datum({})
             .attr("type", "range")

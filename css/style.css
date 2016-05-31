@@ -6,6 +6,13 @@
     stroke: #90C3D4;
 }
 
+
+.node.selected .node_background{
+    fill: red;
+}
+
+
+
 .node_background{
     fill: #CAD658;
     stroke: #CAD658;
@@ -42,6 +49,11 @@
     stroke: #373737;
 }
 
+.zone.selected{
+    fill: #498bff;
+    stroke: #498bff;
+}
+
 .zonelabel{
     fill: red;
     stroke: red;
@@ -52,4 +64,8 @@
     stroke: #d6ce51;
     stroke-width: 10px;
     fill: none;
+}
+
+.hidden{
+    display: none;
 }

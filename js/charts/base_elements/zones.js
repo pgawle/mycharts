@@ -52,6 +52,9 @@ BGCharts.zones.prototype = {
             .attr('class', function (d) {
                 return 'zone';
             })
+            .attr('id',function(d){
+                return 'zone'+ d.index;
+            })
 
 
         var labels = container.append("svg:g")
